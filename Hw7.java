@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package hw7;
+package hw7.QueryCost;
 
 import java.lang.Math;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Libby
+ * @author Libby Rodriguez AND Scott Brown
  */
 public class Hw7 {
 
@@ -25,7 +25,7 @@ public class Hw7 {
         File file = new File(args[0]);
         Scanner fr = null;
         String[] split;
-        int M, cost, pages, files, pages2;
+        int M, cost, pages, files, pages2, stacks;
         String operation, relation, relation2;
         try {
             //Read contents of file into ArrayList
@@ -36,13 +36,8 @@ public class Hw7 {
         if(fr != null){
             while(fr.hasNext()){
                 a = fr.next();
-                ops = a.split(":");
-                cost = getCostMany(ops)
-                
-
-
-
-
+                String[] ops = a.split(":");
+                cost = getCostMany(ops);
 
                 split = a.split(" ");
                 M = split[0].charAt(0) + '0';
@@ -59,11 +54,11 @@ public class Hw7 {
 
                 switch(operation){
                     case "select":
-                        cost = ;
+                        //cost = ;
                         break;
                     case "sort":
-                        cost = 0
-                        stacks = pages
+                        cost = 0;
+                        stacks = pages;
                         while(stacks > 1){
                           cost += sortCost(pages, stacks, M);
                           stacks = sortStacks(stacks, M);
@@ -123,7 +118,7 @@ public class Hw7 {
                     case "sort-difference":
                     case "sort-intersection":
                     case "sort-union":
-                        cost = sortSetCost(pages1, pages2, M)
+                        //cost = sortSetCost(pages, pages2, M);
                         break;
                     default:
                 }
@@ -139,22 +134,25 @@ public class Hw7 {
         
         
     }
+    }
 
-    private static int getCostMany(String[] ops){}
-    private static int getCostOne(String op, 
+    private static int getCostMany(String[] ops){
+        return 0;
+    }
+    private static int getCostOne(String op, boolean is_piped){
+        
+        return 0;
+    }
 
 
 
 
     private static int selectCost(int pages, int M){return pages;}
     private static int sortCost(int pages, int stacks, int M){return stacks<=M ? pages : pages*2;}
-    private static int sortStacks(int pages, int M){return ceil(pages*1.0/M);}
-    private static int sortSetCost(int p1, int p2, int M){
-      if(p1 <= M) return p1 + p2;
-      else{
-        cost = p1 + p2;
-        stacks1 = p1;
-        stacks2 = p2;
+    private static int sortStacks(int pages, int M){return (int) Math.ceil(pages*1.0/M);}
+    private static int[] sortSetCost(int p1, int p2, int stacks1, int stacks2, int M){
+      int cost = p1+p2;
+      if(p1 > M && p2 > M){
         while(stacks1>M){
           cost += sortCost(p1, stacks1, M);
           stacks1 = sortStacks(stacks1, M);
@@ -167,8 +165,8 @@ public class Hw7 {
           if(p1 < p2) cost += sortCost(p1, stacks1, M);
           else cost += sortCost(p2, stacks2, M);
         }
-        return cost;
       }
+      return new int[] {cost, stacks1, stacks2};
     }
    
     public static int sort(int pages, int M){

@@ -18,6 +18,87 @@ import java.util.logging.Logger;
 Map<Integer, Integer> map = new HashMap<Integer, Integer>(); for (Map.Entry<Integer, Integer> entry : map.entrySet()) { System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue()); }
 */
 
+public class Op {
+  public static Op(String op){
+    split = op.split("\\s+");
+    int this.M = Integer.parseInt(split[0]);
+    String this.operation = split[1].toLowerCase();
+    String this.r1 = split[2].toLowerCase();
+    int this.p1 = Integer.parseInt(split[3]);
+    if(split.length > 4){
+      String this.r2 = split[4].toLowerCase();
+      int this.p2 = Integer.parseInt(split[5]);
+    } 
+  }
+ 
+  private int hashSet(Relation rel1, Relation rel2){
+    int perbucket;
+    int cost = 0;
+    if(rel1.pages >= this.M && rel2.pages >= this.M){
+        perbucket = rel1.pages + rel2.pages;
+        while(perbucket > M){
+          perbucket = perbucket/M;
+          cost += 2*rel1.pages + 2*rel2.pages;
+        }
+    }
+    cost += rel1.pages + rel2.pages
+    return cost;
+    
+  private int sortSet(Relation rel1, Relation rel2){ 
+    int cost = 0;
+    if(rel1.pages >= this.M && rel2.pages >= this.M){
+      while(rel1.stacks >= this.M) cost += rel1.sort(this.M);
+      while(rel2.stacks >= this.M) cost += rel2.sort(this.M);
+      if(rel1.stacks + rel2.stacks > M) cost += rel1.pages < rel2.pages ? rel1.sort(this.M) : rel2.sort(this.M);
+    }
+    cost += rel1.pages + rel2.pages;
+    return cost; 
+
+  public int run(HashMap<String, Relation> relationmap){
+    int cost = 0;
+    Relation rel1 = relationmap.get(this.r1);
+    //Unary operators
+    switch(operation){
+
+      case "select":
+        return rel1.pages;
+
+      case "sort":
+        while(rel1.stacks > 1) cost += rel1.sort(this.M);
+        return cost;
+    }
+
+
+    Relation rel2 = relationmap.get(this.r2);         
+    //Binary operators
+    switch(operation){
+      case "block-nested-join":
+        if(rel1.pages < this.M || rel2.pages < this.M) cost = rel1.pages + rel2.pages;
+        else{
+            files = rel1.pages/(this.M-1);
+            cost = rel1.pages + files*rel2.pages;
+        }
+        return cost;
+
+      case "hash-union":
+      case "hash-intersection":
+      case "hash-difference":
+        return hashSet(rel1, rel2);
+
+      case "sort-merge-join":
+      case "sort-difference":
+      case "sort-intersection":
+      case "sort-union":
+        return sortSet(rel1, rel2);
+
+      default:
+    }
+  }
+}
+
+      
+    
+    
 
 //Put these in a hashmap, pointed to by their name
 public class Relation {
@@ -26,9 +107,9 @@ public class Relation {
     int this.stacks = pages;
   }
   //returns the cost of the sort
-  public void sort(int M, boolean write){
+  public void sort(int M){
     this.stacks = Math.ceil(this.stacks*1.0/M);
-    return write ? this.pages*2 : this.pages;
+    return this.pages > M ? this.pages*2 : this.pages;
   }
 }
 
@@ -39,8 +120,9 @@ public class Relation {
 public class Hw7 {
     
     //returns the cost of a series of operations
-    private int performOps(String[] ops){
+    private int performOps(Ops[] ops){
       Map<String, Relation> relations = new HashMap<String, Relation>();
+      
       
       
     /**
@@ -63,91 +145,15 @@ public class Hw7 {
             while(fr.hasNext()){
                 a = fr.next();
                 String[] ops = a.split(":");
-                cost = getCostMany(ops);
-
-                split = a.split(" ");
-                M = split[0].charAt(0) + '0';
-                operation = split[1].toLowerCase();
-                relation = split[2].toLowerCase();
-                pages = Integer.parseInt(split[3]);
-                if(split.length > 4){
-                  relation2 = split[4].toLowerCase();
-                  pages2 = Integer.parseInt(split[5]);
+                Ops[] oplist= new Ops[ops.length];
+                for(int i=0; i < oplist.length; i++)
+                  oplist[i] = Op(ops[i].trim());
                 
 
-        
+   
         //TODO split over the colon!
 
-                switch(operation){
-                    case "select":
-                        //cost = ;
-                        break;
-                    case "sort":
-                        cost = 0;
-                        stacks = pages;
-                        while(stacks > 1){
-                          cost += sortCost(pages, stacks, M);
-                          stacks = sortStacks(stacks, M);
-                        }
-                        break;
-                    case "block-nested-join":
-                        relation2 = split[4];
-                        pages2 = Integer.parseInt(split[5]);
-                        if(pages < M-1 || pages2 < M-1) cost = pages + pages2;
-                        else{
-                            files = pages/M-1;
-                            cost = pages + files*pages2;
-                        }
-                        break;
-                    case "sort-merge-join":
-                        relation2 = split[4];
-                        pages2 = Integer.parseInt(split[5]);
-                        if(pages + pages2 <= M) cost = pages + pages2;
-                        else{
-                            cost = 2*pages + 2*pages2;
-                            if((pages/M + pages2/M) <= M){
-                                files = pages/M + pages2/M;
-                                cost += files*M;
-                            }
-                        }
-                        break;
-                    case "hash-union":
-                        relation2 = split[4];
-                        pages2 = Integer.parseInt(split[5]);
-                        if(pages < M){
-                            cost = pages + pages2;
-                        }else{
-                            files = pages/M;
-                            cost = pages + files*pages2;
-                        }
-                        break;
-                    case "hash-intersection":
-                        relation2 = split[4];
-                        pages2 = Integer.parseInt(split[5]);
-                        if(pages <= M){
-                            cost = pages + pages2;
-                        }else{
-                            files = pages/M;
-                            cost = pages + files*pages2;
-                        }
-                        break;
-                    case "hash-difference":
-                        relation2 = split[4];
-                        pages2 = Integer.parseInt(split[5]);
-                        if(pages <= M){
-                            cost = pages + pages2;
-                        }else{
-                           files = pages/M;
-                           cost = pages + files*pages2;
-                        }
-                        break;
-                    case "sort-difference":
-                    case "sort-intersection":
-                    case "sort-union":
-                        //cost = sortSetCost(pages, pages2, M);
-                        break;
-                    default:
-                }
+
                 
                 //deal with chaining with :
                 
@@ -162,52 +168,5 @@ public class Hw7 {
     }
     }
 
-    private static int getCostMany(String[] ops){
-        return 0;
-    }
-    private static int getCostOne(String op, boolean is_piped){
-        
-        return 0;
-    }
 
-
-
-
-    private static int selectCost(int pages, int M){return pages;}
-    private static int sortCost(int pages, int stacks, int M){return stacks<=M ? pages : pages*2;}
-    private static int sortStacks(int pages, int M){return (int) Math.ceil(pages*1.0/M);}
-    private static int[] sortSetCost(int p1, int p2, int stacks1, int stacks2, int M){
-      int cost = p1+p2;
-      if(p1 > M && p2 > M){
-        while(stacks1>M){
-          cost += sortCost(p1, stacks1, M);
-          stacks1 = sortStacks(stacks1, M);
-        }
-        while(stacks2>M){
-          cost += sortCost(p2, stacks2, M);
-          stacks2 = sortStacks(stacks2,M);
-        }
-        if(stacks1 + stacks2 > M){
-          if(p1 < p2) cost += sortCost(p1, stacks1, M);
-          else cost += sortCost(p2, stacks2, M);
-        }
-      }
-      return new int[] {cost, stacks1, stacks2};
-    }
-   
-    public static int sort(int pages, int M){
-        int files, cost;
-        if(pages <= M) cost = pages;
-        else{
-            cost = 2*pages;
-            files = pages/M;
-            if(files <= M) cost += files*M;
-            while(files > M){
-                cost += 2*pages;
-                files = files/M;
-            }
-            cost += files*M;
-        }
-        return cost;
-    }
 }

@@ -4,6 +4,9 @@
  */
 package hw7.QueryCost;
 
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.lang.Math;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,12 +14,35 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/*
+Map<Integer, Integer> map = new HashMap<Integer, Integer>(); for (Map.Entry<Integer, Integer> entry : map.entrySet()) { System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue()); }
+*/
+
+
+//Put these in a hashmap, pointed to by their name
+public class Relation {
+  public static Relation(int pages){ 
+    int this.pages = pages;
+    int this.stacks = pages;
+  }
+  //returns the cost of the sort
+  public void sort(int M, boolean write){
+    this.stacks = Math.ceil(this.stacks*1.0/M);
+    return write ? this.pages*2 : this.pages;
+  }
+}
+
 /**
  *
  * @author Libby Rodriguez AND Scott Brown
  */
 public class Hw7 {
-
+    
+    //returns the cost of a series of operations
+    private int performOps(String[] ops){
+      Map<String, Relation> relations = new HashMap<String, Relation>();
+      
+      
     /**
      * @param args the command line arguments
      */

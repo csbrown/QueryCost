@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hw7.QueryCost;
 
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.Math;
@@ -19,21 +14,38 @@ Map<Integer, Integer> map = new HashMap<Integer, Integer>(); for (Map.Entry<Inte
 */
 
 public class Op {
-  public static Op(String op){
+  public static Op(String op, HashMap<String, Relation> relationmap){
     split = op.split("\\s+");
     int this.M = Integer.parseInt(split[0]);
     String this.operation = split[1].toLowerCase();
-    String this.r1 = split[2].toLowerCase();
-    int this.p1 = Integer.parseInt(split[3]);
+
+    String r1 = split[2].toLowerCase();
+    int p1 = Integer.parseInt(split[3]);
+    this.rel1 = relationmap.get(r1);
+    if(this.rel1 == null){
+      this.rel1 = new Relation(p1);
+      relationmap.put(r1, this.rel1); 
+    }
+
     if(split.length > 4){
-      String this.r2 = split[4].toLowerCase();
-      int this.p2 = Integer.parseInt(split[5]);
-    } 
+      String r2 = split[4].toLowerCase();
+      int p2 = Integer.parseInt(split[5]);
+      this.rel2 = relationmap.get(r2);
+      if(this.rel2 == null){
+        this.rel2 = new Relation(p2);
+        relationmap.put(r2, this.rel2); 
+      }
+    }
+
+    int this.cost = run();
+
   }
  
-  private int hashSet(Relation rel1, Relation rel2){
+  private int hashSet(){
     int perbucket;
     int cost = 0;
+    Relation rel1 = this.rel1;
+    Relation rel2 = this.rel2;
     if(rel1.pages >= this.M && rel2.pages >= this.M){
         perbucket = rel1.pages + rel2.pages;
         while(perbucket > M){
@@ -44,8 +56,10 @@ public class Op {
     cost += rel1.pages + rel2.pages
     return cost;
     
-  private int sortSet(Relation rel1, Relation rel2){ 
+  private int sortSet(){ 
     int cost = 0;
+    Relation rel1 = this.rel1;
+    Relation rel2 = this.rel2;
     if(rel1.pages >= this.M && rel2.pages >= this.M){
       while(rel1.stacks >= this.M) cost += rel1.sort(this.M);
       while(rel2.stacks >= this.M) cost += rel2.sort(this.M);
@@ -54,9 +68,9 @@ public class Op {
     cost += rel1.pages + rel2.pages;
     return cost; 
 
-  public int run(HashMap<String, Relation> relationmap){
+  public int run(){
     int cost = 0;
-    Relation rel1 = relationmap.get(this.r1);
+    Relation rel1 = this.rel1;
     //Unary operators
     switch(operation){
 
@@ -66,10 +80,12 @@ public class Op {
       case "sort":
         while(rel1.stacks > 1) cost += rel1.sort(this.M);
         return cost;
+    
+      default:
     }
 
 
-    Relation rel2 = relationmap.get(this.r2);         
+    Relation rel2 = this.rel2;         
     //Binary operators
     switch(operation){
       case "block-nested-join":

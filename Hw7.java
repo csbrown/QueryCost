@@ -39,7 +39,7 @@ public class Hw7 {
                 Op o = new Op(a);
                 //do something with o?
                 
-               // System.out.println("Processing [" + a + "]\n Cost: " + cost + "\n \n");
+               System.out.println("Processing [" + a + "]\n Cost: " + o.run() + "\n \n");
             }
         }
     }

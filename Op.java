@@ -17,7 +17,6 @@ public final class Op {
     int M;
     Rel rel1, rel2;
     int cost = 0;
-    HashMap<String, Rel> relationmap = new HashMap<>();
     //Op takes an entire line and we need to split over the colon here
     public Op(String op) {
         
@@ -49,15 +48,9 @@ public final class Op {
             }
         }
 
-        this.cost = run();
 
     }
-    
-    //returns the cost of a series of operations
-    private int performOps(Op[] ops){
-      Map<String, Rel> relations = new HashMap<>();
-      return 0;
-    }
+
     
     private int hashSet(){
         int perbucket;
